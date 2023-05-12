@@ -51,15 +51,15 @@ def get_access_token():
 
     token_endpoint = f'https://{location}.api.cognitive.microsoft.com/sts/v1.0/issuetoken'
     response = requests.post(token_endpoint, headers=headers)
-    return str(response.text)
+    return response.text
 
 def convert_speech_to_text(buffer):
     url = f'https://{location}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1'
 
     headers = {
-        'Authorization': 'Bearer ' + get_access_token(),
+        'Authorization': f'Bearer {get_access_token()}',
         'Content-Type': f'audio/wav; codecs=audio/pcm; samplerate={rate}',
-        'Accept': 'application/json;text/xml'
+        'Accept': 'application/json;text/xml',
     }
 
     params = {
@@ -99,9 +99,7 @@ def process_text(text):
 def get_voice():
     url = f'https://{location}.tts.speech.microsoft.com/cognitiveservices/voices/list'
 
-    headers = {
-        'Authorization': 'Bearer ' + get_access_token()
-    }
+    headers = {'Authorization': f'Bearer {get_access_token()}'}
 
     response = requests.get(url, headers=headers)
     voices_json = json.loads(response.text)
@@ -118,9 +116,9 @@ def get_speech(text):
     url = f'https://{location}.tts.speech.microsoft.com/cognitiveservices/v1'
 
     headers = {
-        'Authorization': 'Bearer ' + get_access_token(),
+        'Authorization': f'Bearer {get_access_token()}',
         'Content-Type': 'application/ssml+xml',
-        'X-Microsoft-OutputFormat': playback_format
+        'X-Microsoft-OutputFormat': playback_format,
     }
 
     ssml =  f'<speak version=\'1.0\' xml:lang=\'{language}\'>'
@@ -178,7 +176,7 @@ def handle_method_request(request):
         payload = json.loads(request.payload)
         seconds = payload['seconds']
         if seconds > 0:
-            create_timer(payload['seconds'])
+            create_timer(seconds)
 
 while True:
     while not button.is_pressed():
